@@ -7,3 +7,4 @@ joblib>=1.2.0
 Pillow
 gdown
 requests
+pydrive

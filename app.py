@@ -39,4 +39,19 @@ def predict_image(image, model):
 model = load_model()
 
 # Streamlit app interface
-st.title("Astronomical Image 
+st.title("Astronomical Image Classifier")
+st.write("Upload an image to classify it into one of the categories.")
+
+uploaded_file = st.file_uploader("Choose an image...", type="jpg")
+
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption='Uploaded Image.', use_column_width=True)
+    st.write("")
+    st.write("Classifying...")
+
+    try:
+        label = predict_image(image, model)
+        st.write(f"Prediction: {label}")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")

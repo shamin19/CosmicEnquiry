@@ -5,8 +5,8 @@ import zipfile
 from utils import load_model, predict_image
 
 # URLs for the dataset and model on Google Drive
-dataset_url = 'https://drive.google.com/drive/folders/1gbU1BcxFsQmhzOt5BzU8DTasRcAjsO9Y'
-model_url = 'https://drive.google.com/drive/folders/18NkHM9CseHzCfuDGd6U4C2IHbkDdVOEG/model.h5'
+dataset_url = 'https://drive.google.com/file/d/1e23T43mfIKI-_qnZ6IwkU4bpl6tu0N6v'
+model_url = 'https://drive.google.com/file/d/1g_QYE3DVhZPHQKavpqMJ-asaG3lvW6D9'
 
 # Paths where the dataset and model will be saved
 dataset_zip_path = 'NASA_APOD_Dataset.zip'

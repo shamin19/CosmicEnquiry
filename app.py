@@ -5,9 +5,9 @@ import zipfile
 from utils import load_model, predict_image
 from PIL import Image
 
-# URLs for the dataset and model on Google Drive
-dataset_url = 'https://drive.google.com/uc?id=1e23T43mfIKI-_qnZ6IwkU4bpl6tu0N6v'
-model_url = 'https://drive.google.com/uc?id=1g_QYE3DVhZPHQKavpqMJ-asaG3lvW6D9'
+# Updated URLs for the dataset and model on Google Drive
+dataset_url = 'https://drive.google.com/uc?export=download&id=1e23T43mfIKI-_qnZ6IwkU4bpl6tu0N6v'
+model_url = 'https://drive.google.com/uc?export=download&id=1g_QYE3DVhZPHQKavpqMJ-asaG3lvW6D9'
 
 # Paths where the dataset and model will be saved
 dataset_zip_path = 'NASA APOD Dataset.zip'
@@ -24,6 +24,8 @@ def download_file(url, output):
                     f.write(chunk)
     except Exception as e:
         st.error(f"Error downloading file: {e}")
+        return False
+    return True
 
 def extract_zip_file(zip_path, extract_to='.'):
     try:
@@ -35,15 +37,19 @@ def extract_zip_file(zip_path, extract_to='.'):
 # Download and extract the dataset if not already present
 if not os.path.exists(dataset_dir):
     st.write("Downloading dataset...")
-    download_file(dataset_url, dataset_zip_path)
-    extract_zip_file(dataset_zip_path)
-    if zipfile.is_zipfile(dataset_zip_path):
-        os.remove(dataset_zip_path)
+    if download_file(dataset_url, dataset_zip_path):
+        extract_zip_file(dataset_zip_path)
+        if zipfile.is_zipfile(dataset_zip_path):
+            os.remove(dataset_zip_path)
 
 # Download the model if not already present
 if not os.path.exists(model_path):
     st.write("Downloading model...")
-    download_file(model_url, model_path)
+    if download_file(model_url, model_path):
+        # Check if the model file is valid
+        if not os.path.exists(model_path) or os.path.getsize(model_path) < 1:
+            st.error("The downloaded model file is not valid.")
+            os.remove(model_path)
 
 # Load the trained model
 model = load_model(model_path)

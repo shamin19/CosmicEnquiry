@@ -11,12 +11,20 @@ def load_model():
 
 # Function to preprocess the image
 def preprocess_image(image):
+    # Ensure the image is in RGB mode
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    
+    # Resize the image
     image = image.resize((150, 150))  # Adjust based on your model's input size
     image = np.array(image)
-    if image.shape[-1] == 4:  # Convert RGBA to RGB if necessary
-        image = image[..., :3]
-    image = image / 255.0  # Normalize
-    image = np.expand_dims(image, axis=0)  # Add batch dimension
+    
+    # Normalize the image
+    image = image / 255.0
+    
+    # Add batch dimension
+    image = np.expand_dims(image, axis=0)
+    
     return image
 
 # Function to make a prediction
@@ -42,5 +50,8 @@ if uploaded_file is not None:
     st.write("")
     st.write("Classifying...")
 
-    label = predict_image(image, model)
-    st.write(f"Prediction: {label}")
+    try:
+        label = predict_image(image, model)
+        st.write(f"Prediction: {label}")
+    except Exception as e:
+        st.error(f"An error occurred: {e}")

@@ -18,8 +18,11 @@ def download_file_from_gdrive(url, output):
     gdown.download(url, output, quiet=False)
 
 def extract_zip_file(zip_path, extract_to='.'):
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_to)
+    if zipfile.is_zipfile(zip_path):
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+    else:
+        st.error(f"The file {zip_path} is not a valid zip file.")
 
 # Download and extract the dataset if not already present
 if not os.path.exists(dataset_dir):

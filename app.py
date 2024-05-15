@@ -1,68 +1,36 @@
 import streamlit as st
-import os
-import requests
-import pandas as pd
-from utils import load_model, predict_image
+import tensorflow as tf
 from PIL import Image
+import numpy as np
 
-# Folder ID for the dataset in Google Drive
-folder_id = '1gbU1BcxFsQmhzOt5BzU8DTasRcAjsO9Y'
+# Function to load the model
+@st.cache_resource
+def load_model():
+    model = tf.keras.models.load_model("model.h5")
+    return model
 
-# Model file ID and path
-model_file_id = '1g_QYE3DVhZPHQKavpqMJ-asaG3lvW6D9'
-model_path = 'model.h5'
+# Function to preprocess the image
+def preprocess_image(image):
+    image = image.resize((150, 150))  # Adjust based on your model's input size
+    image = np.array(image)
+    if image.shape[-1] == 4:  # Convert RGBA to RGB if necessary
+        image = image[..., :3]
+    image = image / 255.0  # Normalize
+    image = np.expand_dims(image, axis=0)  # Add batch dimension
+    return image
 
-# Function to list files in a Google Drive folder
-def list_files_in_folder(folder_id):
-    url = f"https://drive.google.com/drive/folders/{folder_id}?usp=sharing"
-    gdown_output = "file_list.csv"
-    os.system(f"gdown --folder {url} -O {gdown_output}")
-    files_df = pd.read_csv(gdown_output)
-    return files_df
-
-# Function to download files using requests
-def download_file(url, output):
-    try:
-        with requests.get(url, stream=True) as r:
-            r.raise_for_status()
-            with open(output, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=8192):
-                    f.write(chunk)
-    except Exception as e:
-        st.error(f"Error downloading file: {e}")
-        return False
-    return True
-
-# Function to download Google Drive file by ID
-def download_gdrive_file(file_id, dest_path):
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    return download_file(url, dest_path)
-
-# List files in the folder
-files_df = list_files_in_folder(folder_id)
-
-# Download and save dataset files if not already present
-for index, row in files_df.iterrows():
-    file_id = row["id"]
-    file_name = row["name"]
-    file_path = os.path.join("NASA APOD Dataset", file_name)
-    if not os.path.exists(file_path):
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        st.write(f"Downloading {file_path}...")
-        download_gdrive_file(file_id, file_path)
-
-# Download the model if not already present
-if not os.path.exists(model_path):
-    st.write("Downloading model...")
-    if download_gdrive_file(model_file_id, model_path):
-        # Check if the model file is valid
-        if not os.path.exists(model_path) or os.path.getsize(model_path) < 1:
-            st.error("The downloaded model file is not valid.")
-            os.remove(model_path)
+# Function to make a prediction
+def predict_image(image, model):
+    processed_image = preprocess_image(image)
+    prediction = model.predict(processed_image)
+    class_index = np.argmax(prediction, axis=1)[0]
+    class_labels = {0: 'Comets', 1: 'Galaxies', 2: 'Moons', 3: 'Nebulas', 4: 'Planets', 5: 'Stars', 6: 'Sun'}  # Update based on your model
+    return class_labels[class_index]
 
 # Load the trained model
-model = load_model(model_path)
+model = load_model()
 
+# Streamlit app interface
 st.title("Astronomical Image Classifier")
 st.write("Upload an image to classify it into one of the categories.")
 

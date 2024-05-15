@@ -11,12 +11,20 @@ def load_model():
 
 # Function to preprocess the image
 def preprocess_image(image):
+    # Ensure the image is in RGB mode
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    
+    # Resize the image
     image = image.resize((150, 150))  # Adjust based on your model's input size
     image = np.array(image)
-    if image.shape[-1] == 4:  # Convert RGBA to RGB if necessary
-        image = image[..., :3]
-    image = image / 255.0  # Normalize
-    image = np.expand_dims(image, axis=0)  # Add batch dimension
+    
+    # Normalize the image
+    image = image / 255.0
+    
+    # Add batch dimension
+    image = np.expand_dims(image, axis=0)
+    
     return image
 
 # Function to make a prediction
@@ -31,16 +39,4 @@ def predict_image(image, model):
 model = load_model()
 
 # Streamlit app interface
-st.title("Astronomical Image Classifier")
-st.write("Upload an image to classify it into one of the categories.")
-
-uploaded_file = st.file_uploader("Choose an image...", type="jpg")
-
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image.', use_column_width=True)
-    st.write("")
-    st.write("Classifying...")
-
-    label = predict_image(image, model)
-    st.write(f"Prediction: {label}")
+st.title("Astronomical Image 

@@ -1,5 +1,5 @@
+import requests
 import streamlit as st
-import gdown
 import os
 import zipfile
 from utils import load_model, predict_image
@@ -14,9 +14,16 @@ dataset_zip_path = 'NASA APOD Dataset.zip'
 dataset_dir = 'NASA APOD Dataset'
 model_path = 'model.h5'
 
-# Function to download files from Google Drive
-def download_file_from_gdrive(url, output):
-    gdown.download(url, output, quiet=False)
+# Function to download files using requests
+def download_file(url, output):
+    try:
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+            with open(output, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+    except Exception as e:
+        st.error(f"Error downloading file: {e}")
 
 def extract_zip_file(zip_path, extract_to='.'):
     try:
@@ -27,14 +34,16 @@ def extract_zip_file(zip_path, extract_to='.'):
 
 # Download and extract the dataset if not already present
 if not os.path.exists(dataset_dir):
-    download_file_from_gdrive(dataset_url, dataset_zip_path)
+    st.write("Downloading dataset...")
+    download_file(dataset_url, dataset_zip_path)
     extract_zip_file(dataset_zip_path)
     if zipfile.is_zipfile(dataset_zip_path):
         os.remove(dataset_zip_path)
 
 # Download the model if not already present
 if not os.path.exists(model_path):
-    download_file_from_gdrive(model_url, model_path)
+    st.write("Downloading model...")
+    download_file(model_url, model_path)
 
 # Load the trained model
 model = load_model(model_path)

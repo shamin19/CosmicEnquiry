@@ -10,7 +10,7 @@ model_url = 'https://drive.google.com/file/d/1g_QYE3DVhZPHQKavpqMJ-asaG3lvW6D9'
 
 # Paths where the dataset and model will be saved
 dataset_zip_path = 'NASA APOD Dataset.zip'
-dataset_dir = 'NASA_APOD_Dataset'
+dataset_dir = 'NASA APOD Dataset'
 model_path = 'model.h5'
 
 # Function to download files from Google Drive

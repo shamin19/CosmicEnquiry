@@ -1,9 +1,9 @@
 import numpy as np
 from PIL import Image
-import joblib
+import tensorflow as tf
 
 def load_model(model_path):
-    return joblib.load(model_path)
+    return tf.keras.models.load_model(model_path)
 
 def preprocess_image(image):
     image = image.resize((150, 150))  # Resize the image to match the input size of your model

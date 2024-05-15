@@ -3,10 +3,11 @@ import gdown
 import os
 import zipfile
 from utils import load_model, predict_image
+from PIL import Image
 
 # URLs for the dataset and model on Google Drive
-dataset_url = 'https://drive.google.com/file/d/1e23T43mfIKI-_qnZ6IwkU4bpl6tu0N6v'
-model_url = 'https://drive.google.com/file/d/1g_QYE3DVhZPHQKavpqMJ-asaG3lvW6D9'
+dataset_url = 'https://drive.google.com/uc?id=1e23T43mfIKI-_qnZ6IwkU4bpl6tu0N6v'
+model_url = 'https://drive.google.com/uc?id=1g_QYE3DVhZPHQKavpqMJ-asaG3lvW6D9'
 
 # Paths where the dataset and model will be saved
 dataset_zip_path = 'NASA APOD Dataset.zip'
@@ -18,17 +19,18 @@ def download_file_from_gdrive(url, output):
     gdown.download(url, output, quiet=False)
 
 def extract_zip_file(zip_path, extract_to='.'):
-    if zipfile.is_zipfile(zip_path):
+    try:
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(extract_to)
-    else:
+    except zipfile.BadZipFile:
         st.error(f"The file {zip_path} is not a valid zip file.")
 
 # Download and extract the dataset if not already present
 if not os.path.exists(dataset_dir):
     download_file_from_gdrive(dataset_url, dataset_zip_path)
     extract_zip_file(dataset_zip_path)
-    os.remove(dataset_zip_path)
+    if zipfile.is_zipfile(dataset_zip_path):
+        os.remove(dataset_zip_path)
 
 # Download the model if not already present
 if not os.path.exists(model_path):

@@ -6,3 +6,4 @@ scikit-learn>=1.0.2
 joblib>=1.2.0
 Pillow
 gdown
+requests
